@@ -29,9 +29,9 @@ const getCatagories = () => {
 }
 
 // fetch the videos from videos api
-const getVideos = async () => {
+const getVideos = async (searchText= "") => {
     try {
-        const response = await fetch('https://openapi.programming-hero.com/api/phero-tube/videos');
+        const response = await fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`);
         const videosData = await response.json();
         getVideoData(videosData.videos);
     }
@@ -43,17 +43,29 @@ const getVideos = async () => {
 //work for render video catagory wise
 const catagoryVideo = (id) => {
     fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
-    .then(res => res.json())
-    .then(data => getVideoData(data.category));
+        .then(res => res.json())
+        .then(data => {
+            getVideoData(data.category);
+            removeActiveBtn();
+            const activeBtn = document.getElementById(`btn-${id}`);
+            activeBtn.classList.add('activeBtn');
+        })
+        .catch(err => console.log(err));
 }
-
+//  remove active button design
+const removeActiveBtn = () =>{
+    const activeButtons = document.getElementsByClassName('catagory-btn');
+    for(let activeButton of activeButtons){
+        activeButton.classList.remove('activeBtn');
+    }
+}
 // next work of getCategories
 const getCatagoryData = (catagories) => {
     const catagoryDiv = document.getElementById('catagories');
     catagories.forEach(catagory => {
         const buttonDiv = document.createElement('div');
         buttonDiv.innerHTML = `
-        <button onclick="catagoryVideo(${catagory.category_id})" class="btn">${catagory.category}<button>
+        <button id="btn-${catagory.category_id}" onclick="catagoryVideo(${catagory.category_id})" class="btn catagory-btn">${catagory.category}<button>
         `;
         catagoryDiv.append(buttonDiv);
     })
@@ -63,6 +75,20 @@ const getCatagoryData = (catagories) => {
 const getVideoData = (videos) => {
     const videoContainer = document.getElementById('video-container');
     videoContainer.innerHTML = '';
+
+    if(videos.length == 0){
+        videoContainer.classList.remove('grid');
+        videoContainer.innerHTML = `
+        <div class ="min-h-[290px] w-[290px] mx-auto text-center justify-center my-14">
+        <img class="w-full" src="./assets/Icon.png" alt="">
+        </div>
+        <p class="text-4xl font-bold py-4 text-center">No Content Available</p>
+        `;
+        return;
+    }
+    else{
+        videoContainer.classList.add('grid');
+    }
     videos.forEach(video => {
         const card = document.createElement('div');
         card.classList = 'card card-compact py-4';
@@ -87,7 +113,11 @@ const getVideoData = (videos) => {
         `;
         videoContainer.append(card);
     })
-}
+};
+
+document.getElementById('searchText').addEventListener('keyup', (event)=>{
+    getVideos(event.target.value);
+})
 getCatagories();
 getVideos();
 
