@@ -1,3 +1,25 @@
+// find year,day, hour ...
+const findTimeFormat = (timeInSeconds) => {
+    if(timeInSeconds < 86400){
+        const hour = parseInt(timeInSeconds / 3600);
+        let remainingSeconds = (timeInSeconds % 3600);
+        const minute = parseInt(remainingSeconds / 60);
+        remainingSeconds = (remainingSeconds % 60);
+        if(hour === 0 && minute === 0){
+            return `${remainingSeconds} seconds ago`;
+        }
+        else if(hour === 0){
+            return `${minute} minutes ${remainingSeconds} seconds ago`
+        }
+        else{
+            return `${hour} hours ${minute} minutes ${remainingSeconds} seconds ago`
+        }
+    }
+    else{
+        return "N/A";
+    }
+}
+
 // fetch the catagories from catagories api
 const getCatagories = () => {
     fetch('https://openapi.programming-hero.com/api/phero-tube/categories')
@@ -36,8 +58,9 @@ const getVideoData = (videos) => {
         const card = document.createElement('div');
         card.classList = 'card card-compact py-4';
         card.innerHTML = `
-        <figure class = "h-[200px]">
+        <figure class = "h-[200px] relative">
         <img class = "w-full h-full object-cover" src="${video.thumbnail}" alt="">
+        <span class="absolute right-2 bottom-2 p-1 bg-black text-white rounded">${findTimeFormat(video.others.posted_date)}</span>
         </figure>
         <div class ="py-4 flex gap-2">
             <div>
@@ -47,7 +70,7 @@ const getVideoData = (videos) => {
             <p class="text-2xl font-bold">${video.title}</p>
             <div class="flex itmes-center gap-2">
             <p class="text-gray-600">${video.authors[0].profile_name}</p>
-            <img class= "w-6" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" alt="">
+            ${video.authors[0].verified === "" ? "" : `<img class= "w-6" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" alt=" ">`}
             </div>
             <p class="py-1">${video.others.views} views</p>
             </div>
