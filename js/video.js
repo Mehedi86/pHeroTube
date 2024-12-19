@@ -1,21 +1,21 @@
 // find year,day, hour ...
 const findTimeFormat = (timeInSeconds) => {
-    if(timeInSeconds < 86400){
+    if (timeInSeconds < 86400) {
         const hour = parseInt(timeInSeconds / 3600);
         let remainingSeconds = (timeInSeconds % 3600);
         const minute = parseInt(remainingSeconds / 60);
         remainingSeconds = (remainingSeconds % 60);
-        if(hour === 0 && minute === 0){
+        if (hour === 0 && minute === 0) {
             return `${remainingSeconds} seconds ago`;
         }
-        else if(hour === 0){
+        else if (hour === 0) {
             return `${minute} minutes ${remainingSeconds} seconds ago`
         }
-        else{
+        else {
             return `${hour} hours ${minute} minutes ${remainingSeconds} seconds ago`
         }
     }
-    else{
+    else {
         return "N/A";
     }
 }
@@ -40,20 +40,29 @@ const getVideos = async () => {
     }
 };
 
+//work for render video catagory wise
+const catagoryVideo = (id) => {
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
+    .then(res => res.json())
+    .then(data => getVideoData(data.category));
+}
+
 // next work of getCategories
 const getCatagoryData = (catagories) => {
     const catagoryDiv = document.getElementById('catagories');
     catagories.forEach(catagory => {
-        const catagoryButton = document.createElement('button');
-        catagoryButton.classList = "btn";
-        catagoryButton.innerText = catagory.category;
-        catagoryDiv.append(catagoryButton);
+        const buttonDiv = document.createElement('div');
+        buttonDiv.innerHTML = `
+        <button onclick="catagoryVideo(${catagory.category_id})" class="btn">${catagory.category}<button>
+        `;
+        catagoryDiv.append(buttonDiv);
     })
 };
 
 // next work of getVideos
 const getVideoData = (videos) => {
     const videoContainer = document.getElementById('video-container');
+    videoContainer.innerHTML = '';
     videos.forEach(video => {
         const card = document.createElement('div');
         card.classList = 'card card-compact py-4';
